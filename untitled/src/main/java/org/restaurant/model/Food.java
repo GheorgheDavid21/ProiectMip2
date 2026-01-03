@@ -1,34 +1,32 @@
 package org.restaurant.model;
 
-public final class Food implements Product {
 
-    private String name;
-    private double price;
+import jakarta.persistence.*;
+
+@Entity
+@DiscriminatorValue("FOOD")
+public class Food extends Product {
+
+    @Column(name = "weight")
     private int weight;
-    public Food(String name, double price, int weight) {
-        this.name = name;
-        this.price = price;
+
+    protected Food() {
+    }
+
+    public Food(String name, double price, String category, int weight) {
+
+        super(name, price, category);
         this.weight = weight;
     }
-    @Override
-    public String getName() {
-        return name;
-    }
-    @Override
-    public double getPrice() {
-        return price;
-    }
+
     public int getWeight() {
         return weight;
     }
     @Override
     public String toString() {
-        return "> " + name + " - " + price + " RON - Gramaj: " + weight + "g";
+        return "> " + this.getName() + " - " + this.getPrice() + " RON - Gramaj: " + weight + "g";
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
 
 }
 
