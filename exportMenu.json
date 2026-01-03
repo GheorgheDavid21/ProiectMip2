@@ -1,0 +1,100 @@
+{
+  "APERITIVE": [
+    {
+      "name": "Bruschete",
+      "price": 20.0,
+      "type": "Food",
+      "weight": 250
+    },
+    {
+      "name": "Salata de pui",
+      "price": 30.5,
+      "type": "Food",
+      "weight": 400
+    }
+  ],
+  "FEL_PRINCIPAL": [
+    {
+      "name": "Pizza Margherita",
+      "price": 45.0,
+      "type": "Food",
+      "weight": 450
+    },
+    {
+      "name": "Paste Carbonara",
+      "price": 52.5,
+      "type": "Food",
+      "weight": 400
+    }
+  ],
+  "DESERT": [
+    {
+      "name": "Cheesecake",
+      "price": 14.99,
+      "type": "Food",
+      "weight": 100
+    },
+    {
+      "name": "Tiramisu",
+      "price": 18.5,
+      "type": "Food",
+      "weight": 120
+    }
+  ],
+  "BAUTURI_RACORITOARE": [
+    {
+      "name": "Limonada",
+      "price": 15.0,
+      "type": "Drink",
+      "volume": 400
+    },
+    {
+      "name": "Pepsi",
+      "price": 13.0,
+      "type": "Drink",
+      "volume": 400
+    }
+  ],
+  "BAUTURI_ALCOOLICE": [
+    {
+      "name": "Bere",
+      "price": 15.0,
+      "type": "Drink",
+      "volume": 500
+    },
+    {
+      "name": "Vin Roșu",
+      "price": 25.0,
+      "type": "Drink",
+      "volume": 250
+    }
+  ],
+  "ALTE_BAUTURI": [
+    {
+      "name": "Apa plata",
+      "price": 8.0,
+      "type": "Drink",
+      "volume": 500
+    },
+    {
+      "name": "Apa carbogazoasă",
+      "price": 8.0,
+      "type": "Drink",
+      "volume": 500
+    }
+  ],
+  "PRODUSE_VEGETARIENE": [
+    {
+      "name": "Burger Vegetarian",
+      "price": 35.0,
+      "type": "Food",
+      "weight": 300
+    },
+    {
+      "name": "Pizza Vegetariana",
+      "price": 45.0,
+      "type": "Food",
+      "weight": 400
+    }
+  ]
+}
