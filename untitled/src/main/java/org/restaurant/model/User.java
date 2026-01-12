@@ -22,7 +22,6 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
-    // Cascade Remove: If a waiter is deleted, their order history is deleted (as requested)
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
@@ -38,4 +37,5 @@ public class User {
     public String getUsername() { return username; }
     public UserRole getRole() { return role; }
     public List<Order> getOrders() { return orders; }
+    public String getPassword() { return password; }
 }

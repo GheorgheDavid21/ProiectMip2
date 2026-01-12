@@ -1,80 +1,107 @@
 package org.restaurant.GUI;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.util.converter.NumberStringConverter;
-import org.restaurant.controller.HistoryController;
-import org.restaurant.controller.MenuController;
-import org.restaurant.controller.OffersController;
+import org.restaurant.controller.*;
+import org.restaurant.model.User;
 import org.restaurant.persistence.OrderRepository;
 import org.restaurant.persistence.PersistenceManager;
 import org.restaurant.persistence.ProductRepository;
-import org.restaurant.view.ProductProfile;
-import org.restaurant.model.Drink;
-import org.restaurant.model.Food;
-import org.restaurant.model.Product;
-
-import java.io.FileReader;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import org.restaurant.persistence.UserRepository;
 
 
 public class RestaurantApplication extends Application {
+    private final ProductRepository productRepository = new ProductRepository();
+    private final OrderRepository orderRepository = new OrderRepository();
+    private final UserRepository userRepository = new UserRepository();
+
+    private Stage primaryStage;
+
     @Override
     public void start(Stage stage) {
-    ProductRepository productRepository = new ProductRepository();
-    OrderRepository orderRepository = new OrderRepository();
+        this.primaryStage = stage;
+        this.primaryStage.setTitle("Restaurant \"La Andrei\"");
 
-    MenuView menuView = new MenuView();
+        showGuestView();
+        primaryStage.show();
+    }
+    public void showGuestView() {
+        GuestView guestView = new GuestView();
+        new GuestController(guestView, productRepository, this);
+        Scene scene = new Scene(guestView.getView(), 1000, 600);
+        primaryStage.setScene(scene);
+    }
 
-    new MenuController(menuView, productRepository);
+    public void showLoginView() {
+        LoginView loginView = new LoginView(this);
+        new LoginController(loginView, new org.restaurant.persistence.UserRepository(), this);
+        Scene scene = new Scene(loginView.getView(), 400, 300);
+        primaryStage.setScene(scene);
+    }
 
-    HistoryView historyView = new HistoryView();
-    HistoryController historyController = new HistoryController(historyView, orderRepository);
+    public void showWaiterDashboard(User loggedUser) {
+        HistoryView historyView = new HistoryView();
 
-    OffersView offersView = new OffersView();
-    new OffersController(offersView);
+        WaiterDashboard dashboard = new WaiterDashboard(this, historyView, new HistoryController(historyView, orderRepository, loggedUser), loggedUser);
+        new WaiterController(dashboard, productRepository, this, orderRepository);
+        Scene scene = new Scene(dashboard.getView(), 1100, 700);
+        primaryStage.setScene(scene);
+    }
+    public void showManagerDashboard() {
+        StaffView staffView = new StaffView();
+        GuestView menuView = new GuestView(); // Reuse GuestView structure
+        OffersView offersView = new OffersView();
+        HistoryView historyView = new HistoryView();
 
-    TabPane tabPane = new TabPane();
+        ManagerDashboard dashboard = new ManagerDashboard(this, staffView, menuView, offersView, historyView);
 
-    Tab menuTab = new Tab("Meniu", menuView.getView());
-    menuTab.setClosable(false);
+        new ManagerController(this, dashboard, userRepository, orderRepository, staffView, menuView, offersView, historyView, productRepository);
 
-    Tab historyTab = new Tab("Istoric comenzi", historyView.getView());
-    historyTab.setClosable(false);
+        Scene scene = new Scene(dashboard.getView(), 1100, 700);
+        primaryStage.setScene(scene);
+    }
 
-    historyTab.setOnSelectionChanged(event -> {
-        if (historyTab.isSelected()) {
-            historyController.refreshData();
-        }
-    });
 
-    Tab offersTab = new Tab("Oferte", offersView.getView());
-    offersTab.setClosable(false);
+    @Override
+    public void stop() {
+        PersistenceManager.getInstance().close();
+    }
 
-    tabPane.getTabs().addAll(menuTab, historyTab, offersTab);
+//        new MenuController(menuView, productRepository);
+//
+//        HistoryView historyView = new HistoryView();
+//        HistoryController historyController = new HistoryController(historyView, orderRepository);
+//
+//        OffersView offersView = new OffersView();
+//        new OffersController(offersView);
+//
+//        TabPane tabPane = new TabPane();
+//
+//        Tab menuTab = new Tab("Meniu", menuView.getView());
+//        menuTab.setClosable(false);
+//
+//        Tab historyTab = new Tab("Istoric comenzi", historyView.getView());
+//        historyTab.setClosable(false);
+//
+//        historyTab.setOnSelectionChanged(event -> {
+//            if (historyTab.isSelected()) {
+//                historyController.refreshData();
+//            }
+//        });
+//
+//        Tab offersTab = new Tab("Oferte", offersView.getView());
+//        offersTab.setClosable(false);
+//
+//        tabPane.getTabs().addAll(menuTab, historyTab, offersTab);
+//
+//        Scene scene = new Scene(tabPane, 1000, 600);
+//        stage.setTitle("Restaurant \"La Andrei\"");
+//        stage.setScene(scene);
+//        stage.show();
 
-    Scene scene = new Scene(tabPane, 1000, 600);
-    stage.setTitle("Restaurant \"La Andrei\"");
-    stage.setScene(scene);
-    stage.show();
+
+
 
 //        Label titleLabel = new Label("Bun venit la Restaurantul \"La Andrei\"!");
 //        titleLabel.setFont(new Font("System Bold", 20.0));
@@ -171,46 +198,7 @@ public class RestaurantApplication extends Application {
 //        stage.setScene(scene);
 //        stage.show();
     }
-//    private void loadProducts(ObservableList<ProductProfile> dest) {
-//        Gson gson = new Gson();
-//        try (FileReader reader = new FileReader(EXPORT_FILE)) {
-//            JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-//            for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
-//                String catName = entry.getKey();
-//                MenuProducts.Category category;
-//                try {
-//                    category = MenuProducts.Category.valueOf(catName);
-//                } catch (IllegalArgumentException ex) {
-//                    continue;
-//                }
-//                for (JsonElement el : entry.getValue().getAsJsonArray()) {
-//                    JsonObject obj = el.getAsJsonObject();
-//                    try {
-//                        String name = obj.has("name") ? obj.get("name").getAsString() : "unnamed";
-//                        double price = obj.has("price") ? obj.get("price").getAsDouble() : 0.0;
-//                        Product p;
-//                        if (obj.has("weight")) {
-//                            int weight = obj.get("weight").getAsInt();
-//                            p = new Food(name, price, weight);
-//                        } else if (obj.has("volume")) {
-//                            int volume = obj.get("volume").getAsInt();
-//                            p = new Drink(name, price, volume);
-//                        } else {
-//                            continue;
-//                        }
-//                        dest.add(new ProductProfile(p, category));
-//                    } catch (Exception ignore) { }
-//                }
-//            }
-//        } catch (Exception e) {
-//            System.out.println("Could not load " + EXPORT_FILE + ": " + e.getMessage());
-//        }
-//    }
 
-    @Override
-    public void stop() {
-        PersistenceManager.getInstance().close();
-    }
 
-}
+
 

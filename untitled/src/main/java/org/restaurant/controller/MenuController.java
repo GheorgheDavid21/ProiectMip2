@@ -5,10 +5,13 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
-import org.restaurant.GUI.MenuView;
+import org.restaurant.GUI.GuestView;
 
+import org.restaurant.GUI.RestaurantApplication;
 import org.restaurant.mapper.ProductMapper;
 import org.restaurant.model.Drink;
 import org.restaurant.model.Food;
@@ -20,24 +23,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-
 public class MenuController {
-    private final MenuView view;
+    private final GuestView view;
     private final ProductRepository productRepository;
     private final ObservableList<ProductProfile> products;
+    private final RestaurantApplication app;
+    private final ObservableList<ProductProfile> masterList = FXCollections.observableArrayList();
 
-    private ChangeListener<Boolean> currentPriceFocusListener;
-
-    public MenuController(MenuView view, ProductRepository productRepository) {
+    public MenuController(GuestView view, ProductRepository productRepository, RestaurantApplication app) {
         this.view = view;
         this.productRepository = productRepository;
+        this.app = app;
         this.products = FXCollections.observableArrayList();
 
         view.getProductList().setItems(products);
@@ -66,140 +65,137 @@ public class MenuController {
                 clearDetails();
             }
         });
+        view.getSearchField().textProperty().addListener((obs, oldV, newV) -> applyFilters());
+        view.getTypeFilter().valueProperty().addListener((obs, oldV, newV) -> applyFilters());
+        view.getVegFilter().selectedProperty().addListener((obs, oldV, newV) -> applyFilters());
+        view.getMinPriceField().textProperty().addListener((obs, oldV, newV) -> applyFilters());
+        view.getMaxPriceField().textProperty().addListener((obs, oldV, newV) -> applyFilters());
 
-        view.getExportMenuItem().setOnAction(e -> handleExport());
-        view.getImportMenuItem().setOnAction(e -> handleImport());
+        view.getResetBtn().setOnAction(e -> resetFilters());
+        view.getLoginButton().setOnAction(e -> app.showGuestView());
     }
 
-    private void handleExport() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Export Menu to JSON");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
-        File file = fileChooser.showSaveDialog(view.getView().getScene().getWindow());
+    private void resetFilters() {
+        view.getSearchField().clear();
+        view.getTypeFilter().getSelectionModel().selectFirst();
+        view.getVegFilter().setSelected(false);
+        view.getMinPriceField().clear();
+        view.getMaxPriceField().clear();
+    }
 
-        if (file != null) {
-            exportToJson(file);
+    private void applyFilters() {
+        String searchText = view.getSearchField().getText().toLowerCase().trim();
+        String selectedType = view.getTypeFilter().getValue();
+        boolean isVegOnly = view.getVegFilter().isSelected();
+        Double minPrice = parseDoubleSafely(view.getMinPriceField().getText());
+        Double maxPrice = parseDoubleSafely(view.getMaxPriceField().getText());
+
+        List<ProductProfile> filtered = masterList.stream()
+                .filter(p -> Optional.ofNullable(p.getName().get())
+                        .map(String::toLowerCase)
+                        .map(name -> name.contains(searchText))
+                        .orElse(false))
+                .filter(p -> {
+                    if ("Mancare".equals(selectedType)) return p.getProduct() instanceof Food;
+                    if ("Bautura".equals(selectedType)) return p.getProduct() instanceof Drink;
+                    return true;
+                })
+                .filter(p -> {
+                    if (isVegOnly) {
+                        return "PRODUSE_VEGETARIENE".equalsIgnoreCase(p.getCategoryName().get());
+                    }
+                    return true;
+                })
+                .filter(p -> {
+                    double price = p.getPrice().get();
+                    if (minPrice != null && price < minPrice) return false;
+                    if (maxPrice != null && price > maxPrice) return false;
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        products.setAll(filtered);
+    }
+
+    private Double parseDoubleSafely(String text) {
+        if (text == null || text.trim().isEmpty()) return null;
+        try {
+            return Double.parseDouble(text.trim());
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 
-    private void handleImport() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Import Menu from JSON");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
-        File file = fileChooser.showOpenDialog(view.getView().getScene().getWindow());
+    public void enableManagerMode() {
+        view.getNameField().setEditable(true);
+        view.getCategoryField().setEditable(true);
+        view.getMeasureField().setEditable(true);
+        view.getPriceField().setEditable(true);
+        view.getSaveDetailsBtn().setVisible(true);
+    }
 
-        if (file != null) {
-            importFromJson(file);
+    public void addNewProduct() {
+        Product newProduct = new Food("Produs Nou", 0.0, "Mancare", 0);
+        productRepository.saveOrUpdate(newProduct);
+        loadData();
+        view.getProductList().getSelectionModel().selectLast();
+    }
+
+    public void deleteSelectedProduct() {
+        ProductProfile selected = view.getProductList().getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Stergi produsul " + selected.getName().get() + "?", ButtonType.YES, ButtonType.NO);
+        if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
+            productRepository.delete(selected.getProduct());
             loadData();
         }
     }
 
-    private void exportToJson(File file) {
-        List<Product> allProducts = productRepository.findAll();
 
-        Map<String, List<Map<String, Object>>> exportMap = new LinkedHashMap<>();
-
-        for (Product p : allProducts) {
-            exportMap.putIfAbsent(p.getCategory(), new ArrayList<>());
-            Map<String, Object> item = new LinkedHashMap<>();
-            item.put("name", p.getName());
-            item.put("price", p.getPrice());
-
-            if (p instanceof Food f) {
-                item.put("type", "Food");
-                item.put("weight", f.getWeight());
-            } else if (p instanceof Drink d) {
-                item.put("type", "Drink");
-                item.put("volume", d.getVolume());
-            }
-            exportMap.get(p.getCategory()).add(item);
-        }
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (FileWriter writer = new FileWriter(file)) {
-            gson.toJson(exportMap, writer);
-            System.out.println("Export successful to " + file.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private void importFromJson(File file) {
-        Gson gson = new Gson();
-        try (FileReader reader = new FileReader(file)) {
-            JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-            for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
-                String category = entry.getKey();
-                JsonArray items = entry.getValue().getAsJsonArray();
-                for (JsonElement el : items) {
-                    JsonObject obj = el.getAsJsonObject();
-                    try {
-                        String name = obj.get("name").getAsString();
-                        double price = obj.get("price").getAsDouble();
-                        Product p = null;
-
-                        if (obj.has("weight")) {
-                            p = new Food(name, price, category, obj.get("weight").getAsInt());
-                        } else if (obj.has("volume")) {
-                            p = new Drink(name, price, category, obj.get("volume").getAsInt());
-                        }
-
-                        if (p != null) {
-                            productRepository.saveOrUpdate(p);
-                        }
-                    } catch (Exception ex) {
-                        System.out.println("Skipping invalid item in import: " + ex.getMessage());
-                    }
-                }
-            }
-            System.out.println("Import successful from " + file.getAbsolutePath());
-        } catch (IOException | JsonParseException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void bindDetails(ProductProfile profile) {
         view.getNameField().setText(profile.getName().get());
-//        view.getPriceField().textProperty().bindBidirectional(profile.getPrice(), new NumberStringConverter());
         view.getCategoryField().setText(profile.getCategoryName().get());
         view.getMeasureField().setText(profile.getMeasure().get());
+        view.getPriceField().setText(String.format("%.2f", profile.getPrice().get()));
 
-        Bindings.bindBidirectional(
-                view.getPriceField().textProperty(),
-                profile.getPrice(),
-                new NumberStringConverter()
-        );
-
-        currentPriceFocusListener = (obs, wasFocused, isFocused) -> {
-            if (!isFocused) {
-                saveProduct(profile);
-            }
-        };
-        view.getPriceField().focusedProperty().addListener(currentPriceFocusListener);
-
-        view.getPriceField().setOnAction(e ->{
-            saveProduct(profile);
-            view.getPriceField().requestFocus();
+        view.getSaveDetailsBtn().setOnAction(e -> {
+            applyChanges(profile);
         });
 
     }
 
-    private void unbindDetails(ProductProfile profile) {
+    private void applyChanges(ProductProfile profile) {
+        String name = view.getNameField().getText();
+        String catStr = view.getCategoryField().getText();
+        String priceStr = view.getPriceField().getText();
+
+        profile.getName().set(name);
+        profile.getProduct().setName(name);
+
+        profile.getCategoryName().set(catStr);
+        profile.getProduct().setCategory(catStr);
+
+        try {
+            String cleanPrice = priceStr.replace("RON", "").replace("ron", "").trim();
+            double price = Double.parseDouble(cleanPrice);
+            profile.getPrice().set(price);
+        } catch (NumberFormatException e) {
+            Alert a = new Alert(Alert.AlertType.ERROR, "Pret invalid!");
+            a.show();
+            return;
+        }
 
         saveProduct(profile);
 
-//        view.getNameField().textProperty().unbindBidirectional(profile.getName());
-//        view.getCategoryField().textProperty().unbindBidirectional(profile.getCategoryName());
-//        view.getMeasureField().textProperty().unbindBidirectional(profile.getMeasure());
+        Alert success = new Alert(Alert.AlertType.INFORMATION, "Produs salvat cu succes.");
+        success.show();
+    }
 
-        Bindings.unbindBidirectional(view.getPriceField().textProperty(), profile.getPrice());
+    private void unbindDetails(ProductProfile profile) {
 
-        if (currentPriceFocusListener != null) {
-            view.getPriceField().focusedProperty().removeListener(currentPriceFocusListener);
-            currentPriceFocusListener = null;
-        }
-
-//        view.getPriceField().clear();
-        view.getPriceField().setOnAction(null);
+        view.getSaveDetailsBtn().setOnAction(null);
     }
 
     private void saveProduct(ProductProfile profile) {
@@ -213,14 +209,18 @@ public class MenuController {
         view.getPriceField().clear();
         view.getCategoryField().clear();
         view.getMeasureField().clear();
+        view.getSaveDetailsBtn().setOnAction(null);
     }
 
-    private void loadData() {
+    public void loadData() {
         List<Product> entities = productRepository.findAll();
         List<ProductProfile> profiles = entities.stream()
                 .map(ProductMapper::toProfile)
                 .collect(Collectors.toList());
         products.setAll(profiles);
+
+        masterList.setAll(profiles);
+        applyFilters();
 
         if (!products.isEmpty()) {
             view.getProductList().getSelectionModel().selectFirst();

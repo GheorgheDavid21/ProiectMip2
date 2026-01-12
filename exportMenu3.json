@@ -1,0 +1,114 @@
+[
+  {
+    "volume": 500,
+    "id": 11,
+    "name": "Apa",
+    "price": 15.0,
+    "category": "ALTE_BAUTURI",
+    "type": "drink"
+  },
+  {
+    "volume": 500,
+    "id": 12,
+    "name": "Apa plata",
+    "price": 8.0,
+    "category": "ALTE_BAUTURI",
+    "type": "drink"
+  },
+  {
+    "volume": 500,
+    "id": 9,
+    "name": "Bere",
+    "price": 14.0,
+    "category": "BAUTURI_ALCOOLICE",
+    "type": "drink"
+  },
+  {
+    "weight": 250,
+    "id": 3,
+    "name": "Bruschete",
+    "price": 20.0,
+    "category": "APERITIVE",
+    "type": "food"
+  },
+  {
+    "weight": 300,
+    "id": 13,
+    "name": "Burger Vegetarian",
+    "price": 35.0,
+    "category": "PRODUSE_VEGETARIENE",
+    "type": "food"
+  },
+  {
+    "weight": 100,
+    "id": 5,
+    "name": "Cheesecake",
+    "price": 14.99,
+    "category": "DESERT",
+    "type": "food"
+  },
+  {
+    "volume": 400,
+    "id": 7,
+    "name": "Limonada",
+    "price": 15.0,
+    "category": "BAUTURI_RACORITOARE",
+    "type": "drink"
+  },
+  {
+    "weight": 400,
+    "id": 2,
+    "name": "Paste Carbonara",
+    "price": 52.5,
+    "category": "FEL_PRINCIPAL",
+    "type": "food"
+  },
+  {
+    "volume": 400,
+    "id": 8,
+    "name": "Pepsi",
+    "price": 13.0,
+    "category": "BAUTURI_RACORITOARE",
+    "type": "drink"
+  },
+  {
+    "weight": 450,
+    "id": 1,
+    "name": "Pizza Margherita",
+    "price": 45.0,
+    "category": "FEL_PRINCIPAL",
+    "type": "food"
+  },
+  {
+    "weight": 400,
+    "id": 14,
+    "name": "Pizza Vegetariana",
+    "price": 45.0,
+    "category": "PRODUSE_VEGETARIENE",
+    "type": "food"
+  },
+  {
+    "weight": 400,
+    "id": 4,
+    "name": "Salata de pui",
+    "price": 30.5,
+    "category": "APERITIVE",
+    "type": "food"
+  },
+  {
+    "weight": 120,
+    "id": 6,
+    "name": "Tiramisu",
+    "price": 18.5,
+    "category": "DESERT",
+    "type": "food"
+  },
+  {
+    "volume": 250,
+    "id": 10,
+    "name": "Vin Roșu",
+    "price": 25.0,
+    "category": "BAUTURI_ALCOOLICE",
+    "type": "drink"
+  }
+]

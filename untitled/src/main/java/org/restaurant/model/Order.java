@@ -15,7 +15,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user; // The waiter who placed the order
+    private User user;
 
     private int tableNumber;
 
@@ -37,8 +37,8 @@ public class Order {
     public int getTableNumber() { return tableNumber; }
     public LocalDateTime getOrderDate() { return orderDate; }
 
-    public void addItem(Product product, int quantity) {
-        items.add(new OrderItem(this, product, quantity));
+    public void addItem(OrderItem item) {
+        items.add(item);
     }
 
     public List<OrderItem> getItems() { return items; }
@@ -48,4 +48,8 @@ public class Order {
     public double getTotalAmount() { return totalAmount; }
     public double getDiscountAmount() { return discountAmount; }
     public Long getId() { return id; }
+
+    public void removeItem(OrderItem orderItem) {
+        items.remove(orderItem);
+    }
 }

@@ -38,4 +38,8 @@ public class OrderItem {
     public double getTotalPrice() {
         return priceAtOrder * quantity;
     }
+
+    public void addQuantity(int i) {
+        this.quantity += i;
+    }
 }
