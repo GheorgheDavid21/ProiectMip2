@@ -1,7 +1,6 @@
 package org.restaurant.view;
 
 import javafx.beans.property.*;
-import org.restaurant.model.Order;
 import org.restaurant.model.OrderItem;
 
 public class OrderItemView {
@@ -49,8 +48,4 @@ public class OrderItemView {
         this.quantity.set(orderItem.getQuantity());
     }
 
-//    public String getTotalPrice() {
-//        double total = this.priceAtOrder * this.quantity;
-//        return String.format("%.2f RON", total);
-//    }
 }

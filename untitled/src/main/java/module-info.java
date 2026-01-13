@@ -10,13 +10,9 @@ module org.restaurant {
     requires org.hibernate.orm.core;
     requires java.naming;
     requires org.postgresql.jdbc;
-//    requires org.restaurant;
 
     uses jakarta.persistence.spi.PersistenceProvider;
 
-
-//    opens org.restaurant to javafx.graphics, javafx.fxml, com.google.gson, org.hibernate.orm.core;
-//    exports org.restaurant;
     exports org.restaurant.lambda;
     opens org.restaurant.lambda to javafx.fxml, javafx.graphics, com.google.gson;
     exports org.restaurant.model;

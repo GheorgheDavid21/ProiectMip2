@@ -11,6 +11,7 @@ import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
 import org.restaurant.GUI.GuestView;
 
+import org.restaurant.GUI.ProductDialog;
 import org.restaurant.GUI.RestaurantApplication;
 import org.restaurant.mapper.ProductMapper;
 import org.restaurant.model.Drink;
@@ -32,11 +33,13 @@ public class MenuController {
     private final ObservableList<ProductProfile> products;
     private final RestaurantApplication app;
     private final ObservableList<ProductProfile> masterList = FXCollections.observableArrayList();
+    private final ProductDialog productDialog;
 
-    public MenuController(GuestView view, ProductRepository productRepository, RestaurantApplication app) {
+    public MenuController(GuestView view, ProductRepository productRepository, RestaurantApplication app, ProductDialog productDialog) {
         this.view = view;
         this.productRepository = productRepository;
         this.app = app;
+        this.productDialog = productDialog;
         this.products = FXCollections.observableArrayList();
 
         view.getProductList().setItems(products);
@@ -73,6 +76,25 @@ public class MenuController {
 
         view.getResetBtn().setOnAction(e -> resetFilters());
         view.getLoginButton().setOnAction(e -> app.showGuestView());
+        productDialog.setResultConverter(dialogButton -> {
+            if (dialogButton == productDialog.getSaveButtonType()) {
+                try {
+                    String name = productDialog.getNameField().getText();
+                    double price = Double.parseDouble(productDialog.getPriceField().getText());
+                    String category = productDialog.getCategoryField().getText();
+                    int measure = Integer.parseInt(productDialog.getMeasureField().getText());
+
+                    if (productDialog.getTypeCombo().getValue().equals("Mancare")) {
+                        return new Food(name, price, category, measure);
+                    } else {
+                        return new Drink(name, price, category, measure);
+                    }
+                } catch (Exception ex) {
+                    return null;
+                }
+            }
+            return null;
+        });
     }
 
     private void resetFilters() {
@@ -135,10 +157,22 @@ public class MenuController {
     }
 
     public void addNewProduct() {
-        Product newProduct = new Food("Produs Nou", 0.0, "Mancare", 0);
-        productRepository.saveOrUpdate(newProduct);
-        loadData();
-        view.getProductList().getSelectionModel().selectLast();
+        productDialog.getNameField().clear();
+        productDialog.getPriceField().clear();
+        productDialog.getCategoryField().clear();
+        productDialog.getMeasureField().clear();
+
+        if (productDialog.getTypeCombo() != null && !productDialog.getTypeCombo().getItems().isEmpty()) {
+            productDialog.getTypeCombo().getSelectionModel().selectFirst();
+        }
+
+        Optional<Product> result = productDialog.showAndWait();
+
+        result.ifPresent(product -> {
+            ProductProfile profile = ProductMapper.toProfile(product);
+            saveProduct(profile);
+            loadData();
+        });
     }
 
     public void deleteSelectedProduct() {

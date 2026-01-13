@@ -141,8 +141,14 @@ public class WaiterController {
         }
 
         if (OffersController.MEAL_DEAL_ACTIVE) {
-            List<Product> pizzas = expandProducts(realItems, "Pizza", false);
-            List<Product> desserts = expandProducts(realItems, "Desert", false);
+            List<Product> pizzas = expandProducts(realItems, "Pizza");
+            List<Product> desserts = new ArrayList<>();
+            for (OrderItem item : realItems) {
+                if (item.getProduct() instanceof Food &&
+                        (item.getProduct().getCategory().equalsIgnoreCase("desert"))){
+                    for (int i = 0; i < item.getQuantity(); i++) desserts.add(item.getProduct());
+                }
+            }
 
             int pairs = Math.min(pizzas.size(), desserts.size());
             desserts.sort(Comparator.comparingDouble(Product::getPrice));
@@ -154,7 +160,7 @@ public class WaiterController {
         }
 
         if (OffersController.PARTY_PACK_ACTIVE) {
-            List<Product> pizzas = expandProducts(realItems, "Pizza", true);
+            List<Product> pizzas = expandProducts(realItems, "Pizza");
             pizzas.sort(Comparator.comparingDouble(Product::getPrice));
 
             int freePizzas = pizzas.size() / 4;
@@ -181,15 +187,11 @@ public class WaiterController {
         list.add(item);
     }
 
-    private List<Product> expandProducts(List<OrderItem> items, String keyword, boolean strict) {
+    private List<Product> expandProducts(List<OrderItem> items, String keyword) {
         List<Product> expanded = new ArrayList<>();
         for (OrderItem oi : items) {
             Product p = oi.getProduct();
-            boolean match = false;
             if (p.getName().contains(keyword) || (p.getCategory() != null && p.getCategory().contains(keyword))) {
-                match = true;
-            }
-            if (match) {
                 for (int i = 0; i < oi.getQuantity(); i++) expanded.add(p);
             }
         }

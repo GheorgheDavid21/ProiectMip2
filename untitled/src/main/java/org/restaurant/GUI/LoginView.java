@@ -4,8 +4,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import org.restaurant.model.User;
-import org.restaurant.model.UserRole;
 
 public class LoginView {
     private final RestaurantApplication app;

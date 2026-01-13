@@ -3,7 +3,6 @@ package org.restaurant.controller;
 import org.restaurant.GUI.LoginView;
 import org.restaurant.GUI.RestaurantApplication;
 import org.restaurant.model.User;
-import org.restaurant.persistence.ProductRepository;
 import org.restaurant.persistence.UserRepository;
 
 public class LoginController {

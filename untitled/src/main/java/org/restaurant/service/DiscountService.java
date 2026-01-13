@@ -31,7 +31,6 @@ public class DiscountService {
         return totalDiscount;
     }
 
-    // Happy Hour: Every 2nd drink is 50% off
     private double applyHappyHour(List<OrderItem> items) {
         List<Double> drinkPrices = new ArrayList<>();
         for (OrderItem item : items) {
@@ -41,7 +40,6 @@ public class DiscountService {
                 }
             }
         }
-        // Sort cheapest first to apply discount to them (standard practice) or logic as defined
         drinkPrices.sort(Comparator.naturalOrder());
 
         double discount = 0;
@@ -53,7 +51,6 @@ public class DiscountService {
         return discount;
     }
 
-    // Meal Deal: If Pizza exists, cheapest dessert is 25% off
     private double applyMealDeal(List<OrderItem> items) {
         boolean hasPizza = items.stream()
                 .anyMatch(i -> i.getProduct().getName().toLowerCase().contains("pizza"));
@@ -68,7 +65,6 @@ public class DiscountService {
                 .orElse(0.0);
     }
 
-    // Party Pack: Buy 4 Pizzas, cheapest is free
     private double applyPartyPack(List<OrderItem> items) {
         List<Double> pizzaPrices = new ArrayList<>();
         for (OrderItem item : items) {

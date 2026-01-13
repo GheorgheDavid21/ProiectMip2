@@ -6,9 +6,6 @@ import org.restaurant.model.Food;
 import org.restaurant.model.Product;
 
 public class ProductProfile {
-//    private final Product product;
-//    private final MenuProducts.Category category;
-//    private final boolean isFood;
     private final Product product;
 
     private final StringProperty name = new SimpleStringProperty();

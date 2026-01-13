@@ -36,7 +36,6 @@ public class HistoryView {
         totalCol.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
 
         TableColumn<Order, String> waiterCol = new TableColumn<>("Ospatar");
-        // Cell value factory for waiter will be set in controller or here if simple
 
         orderTable.getColumns().addAll(idCol, dateCol, waiterCol, tableCol, totalCol);
         orderTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

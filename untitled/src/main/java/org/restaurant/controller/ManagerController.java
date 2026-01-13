@@ -34,14 +34,14 @@ public class ManagerController {
                              GuestView menuView,
                              OffersView offersView,
                              HistoryView historyView,
-                             ProductRepository productRepository) {
+                             ProductRepository productRepository, ProductDialog productDialog) {
         this.app = app;
         this.dashboard = dashboard;
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.staffController = new StaffController(staffView, userRepository);
-        this.menuController = new MenuController(menuView, productRepository, app);
+        this.menuController = new MenuController(menuView, productRepository, app, productDialog);
         this.menuController.enableManagerMode(); // Enable edit capability for manager
         this.historyController = new HistoryController(historyView, orderRepository, null);
         this.offersController = new OffersController(offersView);

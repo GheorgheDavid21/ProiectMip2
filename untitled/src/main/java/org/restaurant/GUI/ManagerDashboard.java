@@ -13,7 +13,6 @@ public class ManagerDashboard {
 
     private final Button addProductBtn;
     private final Button delProductBtn;
-//    private final Button logoutBtn;
 
     private final MenuItem importItem;
     private final MenuItem exportItem;
@@ -47,11 +46,6 @@ public class ManagerDashboard {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         menuView.getLoginButton().setText("Deconectare");
-//        logoutBtn = new Button("Deconectare");
-//        logoutBtn.setStyle("-fx-background-color: #d9534f; -fx-text-fill: white;");
-//        logoutBtn.setOnAction(e -> app.showGuestView());
-
-
 
         header.getChildren().addAll(title, spacer );
         VBox topContainer = new VBox(menuBar, header);
@@ -83,8 +77,6 @@ public class ManagerDashboard {
         Tab offersTab = new Tab("Oferte Speciale", offersView.getView());
 
 
-
-
         fileMenu.getItems().addAll(importItem, exportItem);
 
 
@@ -105,10 +97,6 @@ public class ManagerDashboard {
     public Button getDelProductBtn() {
         return delProductBtn;
     }
-
-//    public Button getLogoutBtn() {
-//        return logoutBtn;
-//    }
 
     public MenuItem getMenuExportBtn() {
         return exportItem;

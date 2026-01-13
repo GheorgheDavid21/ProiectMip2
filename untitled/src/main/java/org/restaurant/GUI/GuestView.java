@@ -29,10 +29,6 @@ public class GuestView {
     private final Button saveDetailsBtn;
 
 
-
-
-
-
     public GuestView() {
         root = new BorderPane();
 
@@ -71,9 +67,6 @@ public class GuestView {
 
         MenuBar menuBar = new MenuBar();
         Menu fileMenu = new Menu("File");
-//        importItem = new MenuItem("Import JSON");
-//        exportItem = new MenuItem("Export JSON");
-//        fileMenu.getItems().addAll(importItem, exportItem);
 
         VBox topSection = new VBox(menuBar, topContainer);
         root.setTop(topSection);
@@ -131,8 +124,6 @@ public class GuestView {
     public TextField getCategoryField() { return categoryField; }
     public TextField getMeasureField() { return measureField; }
     public TextField getPriceField() { return priceField; }
-//    public MenuItem getImportMenuItem() { return importItem; }
-//    public MenuItem getExportMenuItem() { return exportItem; }
 
     public ComboBox<String> getTypeFilter() {
         return typeFilter;

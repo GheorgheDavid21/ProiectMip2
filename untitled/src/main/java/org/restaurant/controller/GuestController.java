@@ -2,12 +2,7 @@ package org.restaurant.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import org.restaurant.GUI.GuestView;
 import org.restaurant.GUI.RestaurantApplication;
 import org.restaurant.mapper.ProductMapper;

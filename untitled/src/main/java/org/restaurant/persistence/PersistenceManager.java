@@ -1,10 +1,8 @@
 package org.restaurant.persistence;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
-import static jakarta.persistence.Persistence.createEntityManagerFactory;
 
 public class PersistenceManager {
 

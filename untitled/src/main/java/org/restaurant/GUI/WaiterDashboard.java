@@ -1,7 +1,6 @@
 package org.restaurant.GUI;
 
 import javafx.beans.binding.Bindings;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -10,7 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.restaurant.controller.HistoryController;
 import org.restaurant.model.User;
-import org.restaurant.persistence.OrderRepository;
 import org.restaurant.view.OrderItemView;
 import org.restaurant.view.ProductProfile;
 
